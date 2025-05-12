@@ -437,11 +437,11 @@ class GatewayBase(ConnectorBase):
             *[tracked_order.get_exchange_order_id() for tracked_order in tracked_orders]
         )
 
-        self.logger().info(
-            "Polling for order status updates of %d orders. Transaction hashes: %s",
-            len(tracked_orders),
-            tx_hash_list
-        )
+        # self.logger().info(
+        #     "Polling for order status updates of %d orders. Transaction hashes: %s",
+        #     len(tracked_orders),
+        #     tx_hash_list
+        # )
 
         update_results: List[Union[Dict[str, Any], Exception]] = await safe_gather(*[
             self._get_gateway_instance().get_transaction_status(
@@ -536,14 +536,14 @@ class GatewayBase(ConnectorBase):
 
     def _get_transaction_receipt_from_details(self, tx_details: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         if self.chain == "ethereum":
-            return tx_details.get("txReceipt")
+            return tx_details.get("txData")
         elif self.chain == "solana":
             return tx_details.get("txData")
         raise NotImplementedError(f"Unsupported chain: {self.chain}")
 
     def _is_transaction_successful(self, tx_status: int, tx_receipt: Optional[Dict[str, Any]]) -> bool:
         if self.chain == "ethereum":
-            return tx_status == 1 and tx_receipt is not None and tx_receipt.get("status") == 1
+            return tx_status == 1 and tx_receipt is not None
         elif self.chain == "solana":
             return tx_status == 1 and tx_receipt is not None
         raise NotImplementedError(f"Unsupported chain: {self.chain}")
@@ -557,7 +557,7 @@ class GatewayBase(ConnectorBase):
 
     def _is_transaction_failed(self, tx_status: int, tx_receipt: Optional[Dict[str, Any]]) -> bool:
         if self.chain == "ethereum":
-            return tx_status == -1 or (tx_receipt is not None and tx_receipt.get("status") == 0)
+            return tx_status == -1 or tx_receipt is not None
         elif self.chain == "solana":
             return tx_status == -1
         raise NotImplementedError(f"Unsupported chain: {self.chain}")

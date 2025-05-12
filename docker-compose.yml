@@ -1,7 +1,7 @@
 services:
-  hummingbot:
-    container_name: hummingbot
-    image: hummingbot/hummingbot:latest
+  hummingbot-range-bound:
+    container_name: hummingbot-range-bound
+    # image: hummingbot/hummingbot:latest
     build:  # Uncomment this and comment image if you want to build it locally
       context: .
       dockerfile: Dockerfile
@@ -11,8 +11,8 @@ services:
       - ./conf/strategies:/home/hummingbot/conf/strategies
       - ./conf/controllers:/home/hummingbot/conf/controllers
       - ./conf/scripts:/home/hummingbot/conf/scripts
-      - ./logs:/home/hummingbot/logs
-      - ./data:/home/hummingbot/data
+      - ./logs/range_bound:/home/hummingbot/logs
+      - ./data/range_bound:/home/hummingbot/data
       - ./certs:/home/hummingbot/certs
       - ./scripts:/home/hummingbot/scripts
       - ./controllers:/home/hummingbot/controllers
@@ -24,6 +24,32 @@ services:
     tty: true
     stdin_open: true
     network_mode: host
+
+  # hummingbot-arb:
+  #   container_name: hummingbot-arb
+  #   # image: hummingbot/hummingbot:latest
+  #   build:  # Uncomment this and comment image if you want to build it locally
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./conf:/home/hummingbot/conf
+  #     - ./conf/connectors:/home/hummingbot/conf/connectors
+  #     - ./conf/strategies:/home/hummingbot/conf/strategies
+  #     - ./conf/controllers:/home/hummingbot/conf/controllers
+  #     - ./conf/scripts:/home/hummingbot/conf/scripts
+  #     - ./logs/arb:/home/hummingbot/logs
+  #     - ./data/arb:/home/hummingbot/data
+  #     - ./certs:/home/hummingbot/certs
+  #     - ./scripts:/home/hummingbot/scripts
+  #     - ./controllers:/home/hummingbot/controllers
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+  #   tty: true
+  #   stdin_open: true
+  #   network_mode: host
 #    environment:
 #      - CONFIG_PASSWORD=a
 #      - CONFIG_FILE_NAME=v2_with_controllers.py

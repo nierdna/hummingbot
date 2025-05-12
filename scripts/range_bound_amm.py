@@ -140,12 +140,12 @@ class RangeBoundAMM(ScriptStrategyBase):
             # Calculate buy amount based on available quote balance
             buy_amount = self.config.base_amount
             
-            # Xử lý trading_pair dạng TOKEN_WETH hoặc TOKEN_SOL
-            token_parts = self.config.trading_pair.split("_")
+            # Xử lý trading_pair dạng TOKEN-WETH hoặc TOKEN-SOL
+            token_parts = self.config.trading_pair.split("-")
             if len(token_parts) == 2 and ("WETH" in token_parts or "SOL" in token_parts):
                 main_token = "WETH" if "WETH" in token_parts else "SOL"
                 # Đảo vị trí để WETH/SOL thành token đầu tiên
-                reversed_trading_pair = "_".join([token_parts[1], token_parts[0]]) if token_parts[1] == main_token else "_".join([token_parts[0], token_parts[1]])
+                reversed_trading_pair = "-".join([token_parts[1], token_parts[0]]) if token_parts[1] == main_token else "-".join([token_parts[0], token_parts[1]])
                 
                 self.log_with_clock(
                     logging.INFO, 

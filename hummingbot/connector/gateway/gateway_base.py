@@ -536,14 +536,14 @@ class GatewayBase(ConnectorBase):
 
     def _get_transaction_receipt_from_details(self, tx_details: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         if self.chain == "ethereum":
-            return tx_details.get("txData")
+            return tx_details.get("txReceipt")
         elif self.chain == "solana":
             return tx_details.get("txData")
         raise NotImplementedError(f"Unsupported chain: {self.chain}")
 
     def _is_transaction_successful(self, tx_status: int, tx_receipt: Optional[Dict[str, Any]]) -> bool:
         if self.chain == "ethereum":
-            return tx_status == 1 and tx_receipt is not None
+            return tx_status == 1 and tx_receipt is not None and tx_receipt.get("status") == 1
         elif self.chain == "solana":
             return tx_status == 1 and tx_receipt is not None
         raise NotImplementedError(f"Unsupported chain: {self.chain}")
@@ -557,13 +557,16 @@ class GatewayBase(ConnectorBase):
 
     def _is_transaction_failed(self, tx_status: int, tx_receipt: Optional[Dict[str, Any]]) -> bool:
         if self.chain == "ethereum":
-            return tx_status == -1 or tx_receipt is not None
+            return tx_status == -1 or (tx_receipt is not None and tx_receipt.get("status") == 0)
         elif self.chain == "solana":
             return tx_status == -1
         raise NotImplementedError(f"Unsupported chain: {self.chain}")
 
     def _calculate_transaction_fee(self, tracked_order: GatewayInFlightOrder, tx_receipt: Dict[str, Any]) -> Decimal:
         if self.chain == "ethereum":
+            if "gasUsed" not in tx_receipt:
+                self.logger().error(f"Missing 'gasUsed' in transaction receipt: {tx_receipt}")
+                return Decimal(0)
             gas_used: int = tx_receipt["gasUsed"]
             gas_price: Decimal = tracked_order.gas_price
             return Decimal(str(gas_used)) * gas_price / Decimal(1e9)
